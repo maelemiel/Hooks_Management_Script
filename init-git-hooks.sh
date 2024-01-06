@@ -1,5 +1,7 @@
 #!/bin/bash
 
+in_main_loop=false
+
 GREEN="\033[0;32m"
 NO_COLOR="\033[0m"
 
@@ -164,7 +166,32 @@ display_hook_option() {
     echo "$hook_number. $formatted_name Configure $hook_name hook"
 }
 
+show_help() {
+    local in_main_loop=$1
+    echo "Usage: $0 [OPTION]"
+    echo ""
+    echo "Options:"
+    echo "  1                 Configure pre-commit hook."
+    echo "  2                 Configure pre-push hook."
+    echo "  3                 Configure commit-msg hook."
+    echo "  4                 Clear all hooks."
+    echo "  5                 Clear specific hook by number."
+    echo "  6                 Backup hooks."
+    echo "  7                 Restore hooks from backup."
+    echo "  h                 Display this help message and exit."
+    echo "  q                 Quit the script."
+    if [ "$in_main_loop" = false ]; then
+        echo "Run without options to enter the interactive Git Hook Manager menu."
+    fi
+}
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    show_help false
+    exit 0
+fi
+
 main_menu() {
+    in_main_loop=true
     while true; do
         clear
 
@@ -177,6 +204,7 @@ main_menu() {
         echo "5. Clear specific hook by number"
         echo "6. Backup hooks"
         echo "7. Restore hooks from backup"
+        echo "h. show help"
         echo "q. Quit"
         echo ""
         echo -n "Enter your choice: "
@@ -193,6 +221,7 @@ main_menu() {
                 read hook_number
                 clear_specific_hook $hook_number
                 ;;
+            h) show_help "$in_main_loop" ;;
             q)
                 echo "Exiting..."
                 exit 0
