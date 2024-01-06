@@ -1,42 +1,45 @@
 # Git Hooks Management Script
 
-This script offers a convenient way to manage Git hooks within your repository. It enables you to easily create, clear, or verify the configuration of various Git hooks such as `pre-commit`, `pre-push`, and `commit-msg`. The script also provides functionality for backing up and restoring hook configurations, as well as the ability to customize hooks with user-specified parameters.
+This script provides an easy and interactive way to manage Git hooks in your repository. It allows you to quickly create, clear, backup, or restore the configuration of various Git hooks, such as `pre-commit`, `pre-push`, and `commit-msg`.
 
 ## Features
 
-- **Create Hooks:** Configure common Git hooks with predefined or custom actions.
-- **Clear Hooks:** Remove configured hooks individually by their name or number, or clear all hooks at once.
-- **Check Hook Configuration:** Quickly determine which hooks are currently configured.
-- **Backup and Restore Hooks:** Save your current hook configurations and restore them as needed.
-- **Interactive Menu:** Easily navigate and select hook management options through an interactive command-line interface.
-- **Customizable Commit Messages:** For the `commit-msg` hook, specify a file containing required keywords or patterns for commit messages.
+- **Interactive Menu:** Navigate and manage Git hooks through an easy-to-use interactive menu.
+- **Create Hooks:** Configure common Git hooks with customizable actions.
+- **Clear Hooks:** Remove configured hooks individually by their number or clear all hooks at once.
+- **Backup and Restore Hooks:** Easily backup your current hook configurations and restore them as needed.
+- **Check Hook Configuration:** Quickly see which hooks are currently configured and modify them if necessary.
 
 ## Usage
 
-Run the script from the root of your Git repository using one of the following commands:
+To use this script, run it from the root of your Git repository. You'll be presented with an interactive menu where you can select various options:
 
 ```bash
-./init-git-hooks.sh pre-commit    # Create a pre-commit hook
-./init-git-hooks.sh pre-push      # Create a pre-push hook
-./init-git-hooks.sh commit-msg    # Create a commit-msg hook
-./init-git-hooks.sh clear         # Clear all configured hooks
-./init-git-hooks.sh clear-one <hook_number>  # Clear a specific hook by number
+./init-git-hooks.sh
+```
+
+Available Options
+Configure pre-commit hook: Sets up a pre-commit hook that runs 'make' to build the project and checks if a specified executable is created.
+Configure pre-push hook: Establishes a pre-push hook to run tests before pushing code, ensuring all tests pass.
+Configure commit-msg hook: Creates a commit-msg hook that checks the format of your commit messages based on specified patterns.
+Clear all hooks: Removes all configured hooks from the repository.
+Clear specific hook by number: Clears a specified hook based on its number in the menu.
+Backup hooks: Saves the current hook configurations to a backup directory.
+Restore hooks from backup: Restores hooks from the previously saved backup.
 Pre-Commit Hook
-The pre-commit hook runs 'make' to build the project before each commit. It checks if the build is successful and if the specified executable is created. The user can specify the name of the executable.
-
+The pre-commit hook compiles the project using make and checks for the successful creation of a specified executable.
+You can specify the name of the executable when setting up this hook.
 Pre-Push Hook
-The pre-push hook executes tests before pushing the code to the remote repository, ensuring that all tests pass. It performs a cleanup using make fclean.
-
+The pre-push hook executes tests before pushing changes, ensuring that all tests pass.
+It performs a cleanup using make fclean after running the tests.
 Commit-Msg Hook
-The commit-msg hook validates the format of commit messages against a user-provided set of keywords or patterns. This ensures that each commit message starts with specified keywords like [ADD], [FIX], [EDIT], or [DEL].
-
-Backup and Restore Hooks
-You can backup your current hook configurations to a designated directory and restore them later. This feature is useful for maintaining consistent hook settings across different repositories or sharing configurations with team members.
-
+The commit-msg hook validates the format of commit messages against specified patterns or keywords.
+You will be prompted to provide a file containing the required patterns when setting up this hook.
+Backup and Restore
+The script provides options to backup and restore your Git hooks, allowing you to maintain consistent hook configurations across different setups.
 Installation
 Copy the script to the root of your Git repository.
 Make the script executable: chmod +x init-git-hooks.sh.
-Note
-Ensure you have make and other necessary tools installed as required by the hooks.
-Customize the pre-commit hook by replacing "your_executable_name" with the actual name of your executable.
-For the commit-msg hook, provide a file containing the required keywords or patterns for commit messages.
+Notes
+Ensure you have make and any other necessary tools installed as required by the hooks.
+Modify the hooks as needed to fit your specific workflow or project requirements.
