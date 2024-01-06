@@ -9,6 +9,19 @@ if [ ! -d ".git" ]; then
     exit 1
 fi
 
+clear_specific_hook() {
+    hook_name=$1
+    hook_path=".git/hooks/$hook_name"
+
+    if [ -f "$hook_path" ]; then
+        rm -f "$hook_path"
+        echo "Hook '$hook_name' has been cleared."
+    else
+        echo "Hook '$hook_name' not found or already cleared."
+    fi
+}
+
+
 is_hook_configured() {
     hook_path=".git/hooks/$1"
     if [ -f "$hook_path" ] && [ -s "$hook_path" ]; then
@@ -93,20 +106,33 @@ EOF
 # Parse the arguments
 while [ $# -gt 0 ]; do
     case "$1" in
-        clear)
-        clear_hooks
-        ;;
         pre-commit)
             create_pre_commit_hook
+            echo "Usage: $0 [$(is_hook_configured pre-commit) | $(is_hook_configured pre-push) | $(is_hook_configured commit-msg) | clear | clear-one <hook_name>]"
+            break
             ;;
         pre-push)
             create_pre_push_hook
+            echo "Usage: $0 [$(is_hook_configured pre-commit) | $(is_hook_configured pre-push) | $(is_hook_configured commit-msg) | clear | clear-one <hook_name>]"
+            break
             ;;
         commit-msg)
             create_commit_msg_hook
+            echo "Usage: $0 [$(is_hook_configured pre-commit) | $(is_hook_configured pre-push) | $(is_hook_configured commit-msg) | clear | clear-one <hook_name>]"
+            break
+            ;;
+        clear)
+            clear_hooks
+            echo "Usage: $0 [$(is_hook_configured pre-commit) | $(is_hook_configured pre-push) | $(is_hook_configured commit-msg) | clear | clear-one <hook_name>]"
+            break
+            ;;
+        clear-one)
+            clear_specific_hook "$2"
+            echo "Usage: $0 [$(is_hook_configured pre-commit) | $(is_hook_configured pre-push) | $(is_hook_configured commit-msg) | clear | clear-one <hook_name>]"
+            break
             ;;
         *)
-            echo "Usage: $0 [$(is_hook_configured pre-commit)|$(is_hook_configured pre-push)|$(is_hook_configured commit-msg)|clear]"
+            echo "Usage: $0 [$(is_hook_configured pre-commit) | $(is_hook_configured pre-push) | $(is_hook_configured commit-msg) | clear | clear-one <hook_name>]"
             exit 0
     esac
     shift
@@ -114,7 +140,10 @@ done
 
 # Message if no arguments are provided
 if [ $# -eq 0 ]; then
-    echo "Usage: $0 [$(is_hook_configured pre-commit)|$(is_hook_configured pre-push)|$(is_hook_configured commit-msg)|clear]"
-
+    echo "Usage: $0 [$(is_hook_configured pre-commit) | \
+$(is_hook_configured pre-push) | \
+$(is_hook_configured commit-msg) | \
+clear | \
+clear-one <hook_name>]"
     exit 0
 fi
