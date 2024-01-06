@@ -1,0 +1,5 @@
+./Makefile:1: MINOR:C-G1
+./Makefile:21: INFO:C-A3
+./src/main.c:1: MINOR:C-G1
+./src/main.c:1: MINOR:C-L4
+./src/main.c:3: INFO:C-A3

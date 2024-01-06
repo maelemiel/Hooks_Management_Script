@@ -14,3 +14,5 @@ fclean:
 
 test:
 	echo "test"
+
+re: fclean all
