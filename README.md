@@ -15,7 +15,7 @@ This script provides an easy and interactive way to manage Git hooks in your rep
 To use this script, run it from the root of your Git repository. You'll be presented with an interactive menu where you can select various options:
 
 ```bash
-./init-git-hooks.sh
+./hooks_script.sh
 ```
 
 ## Available Options
@@ -53,7 +53,7 @@ To use this script, run it from the root of your Git repository. You'll be prese
 
 ## Installation
 1. Copy the script to the root of your Git repository.
-2. Make the script executable: **'chmod +x init-git-hooks.sh'**.
+2. Make the script executable: **'chmod +x hooks_script.sh'**.
 
 ## Notes
 - Ensure you have **'make'** and any other necessary tools installed as required by the hooks.
