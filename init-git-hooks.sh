@@ -31,7 +31,7 @@ is_hook_configured() {
     fi
 }
 
-create_pre_push_hook() {
+create_pre-push_hook() {
     cat > .git/hooks/pre-push << 'EOF'
 #!/bin/bash
 
@@ -50,7 +50,7 @@ EOF
     echo "Pre-push hook configured."
 }
 
-create_commit_msg_hook() {
+create_commit-msg_hook() {
     cat > .git/hooks/commit-msg << 'EOF'
 #!/bin/bash
 
@@ -69,7 +69,7 @@ clear_hooks() {
 }
 
 # Function to create a pre-commit hook
-create_pre_commit_hook() {
+create_pre-commit_hook() {
     cat > .git/hooks/pre-commit << 'EOF'
 #!/bin/bash
 
@@ -103,47 +103,37 @@ EOF
     echo "Pre-commit hook configured."
 }
 
-# Parse the arguments
-while [ $# -gt 0 ]; do
-    case "$1" in
-        pre-commit)
-            create_pre_commit_hook
-            echo "Usage: $0 [$(is_hook_configured pre-commit) | $(is_hook_configured pre-push) | $(is_hook_configured commit-msg) | clear | clear-one <hook_name>]"
-            break
-            ;;
-        pre-push)
-            create_pre_push_hook
-            echo "Usage: $0 [$(is_hook_configured pre-commit) | $(is_hook_configured pre-push) | $(is_hook_configured commit-msg) | clear | clear-one <hook_name>]"
-            break
-            ;;
-        commit-msg)
-            create_commit_msg_hook
-            echo "Usage: $0 [$(is_hook_configured pre-commit) | $(is_hook_configured pre-push) | $(is_hook_configured commit-msg) | clear | clear-one <hook_name>]"
-            break
-            ;;
-        clear)
-            clear_hooks
-            echo "Usage: $0 [$(is_hook_configured pre-commit) | $(is_hook_configured pre-push) | $(is_hook_configured commit-msg) | clear | clear-one <hook_name>]"
-            break
-            ;;
-        clear-one)
-            clear_specific_hook "$2"
-            echo "Usage: $0 [$(is_hook_configured pre-commit) | $(is_hook_configured pre-push) | $(is_hook_configured commit-msg) | clear | clear-one <hook_name>]"
-            break
-            ;;
-        *)
-            echo "Usage: $0 [$(is_hook_configured pre-commit) | $(is_hook_configured pre-push) | $(is_hook_configured commit-msg) | clear | clear-one <hook_name>]"
-            exit 0
-    esac
-    shift
-done
+hook_created=0
 
-# Message if no arguments are provided
-if [ $# -eq 0 ]; then
+if [ "$1" = "clear" ]; then
+    clear_hooks
+    hook_created=1
+elif [ "$1" = "clear-one" ]; then
+    if [ -n "$2" ]; then
+        clear_specific_hook "$2"
+        hook_created=1
+    else
+        echo "Please specify a hook name to clear."
+        exit 1
+    fi
+else
+    for hook in pre-commit pre-push commit-msg; do
+        if [ "$1" = "$hook" ]; then
+            create_${hook}_hook
+            hook_created=1
+            break
+        fi
+    done
+fi
+
+# Display usage only if no action was taken
+if [ "$hook_created" -eq 0 ]; then
+    echo "Usage: $0 [pre-commit | pre-push | commit-msg | clear | clear-one <hook_name>]"
+    exit 0
+else
     echo "Usage: $0 [$(is_hook_configured pre-commit) | \
 $(is_hook_configured pre-push) | \
 $(is_hook_configured commit-msg) | \
 clear | \
 clear-one <hook_name>]"
-    exit 0
 fi
