@@ -128,7 +128,7 @@ backup_hooks() {
 
     mkdir -p "$backup_dir"
 
-    if cp .git/hooks/* "$backup_dir"/; then
+    if find .git/hooks -maxdepth 1 -type f -exec cp {} "$backup_dir" \; ; then
         echo "The hooks have been saved in $backup_dir"
     else
         echo "Error saving hooks."
@@ -143,7 +143,7 @@ restore_hooks() {
         return 1
     fi
 
-    if cp "$backup_dir"/* .git/hooks/; then
+    if find "$backup_dir" -maxdepth 1 -type f -exec cp {} .git/hooks \; ; then
         echo "The hooks have been restored since $backup_dir"
     else
         echo "Error restoring hooks."
