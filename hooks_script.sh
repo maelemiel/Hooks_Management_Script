@@ -39,7 +39,7 @@ create_pre_push_hook() {
 #!/bin/bash
 
 echo "Running tests before push..."
-make test
+make tests_run
 if [ $? -ne 0 ]; then
     echo "Tests failed. Fix the issues before pushing."
     exit 1
@@ -84,7 +84,7 @@ clear_hooks() {
 }
 
 create_pre_commit_hook() {
-    local executable_name=""
+    executable_name="default"
     echo -n "Enter the name of the executable to build before committing (default: 'default'): "
     read executable_name
 
@@ -92,9 +92,10 @@ create_pre_commit_hook() {
         echo "No executable name specified for the pre-commit hook. Use of 'default."
         executable_name="default"
     fi
+    echo $executable_name > .git/hooks/executable_name.tmp
     cat > .git/hooks/pre-commit << 'EOF'
 #!/bin/bash
-
+executable_name=$(cat .git/hooks/executable_name.tmp)
 echo "Running 'make' to build the project..."
 make
 if [ $? -ne 0 ]; then
