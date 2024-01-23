@@ -35,6 +35,26 @@ clear_specific_hook() {
 
 
 create_pre_push_hook() {
+    echo "1. Run tests before pushing with all test passed"
+    echo "2. Run tests before pushing with a certain percentage passed"
+    echo "3. Run tests before pushing with a percentage greater than or equal to the last test run"
+    echo "4. Run tests before pushing with no errors in the epitech standard"
+    echo -n "Enter the number of the choice you want to make: "
+    read choice_pre_push
+    if [ "$choice_pre_push" = "1" ]; then
+        create_pre_push_hook_1
+    elif [ "$choice_pre_push" = "2" ]; then
+        create_pre_push_hook_2
+    elif [ "$choice_pre_push" = "3" ]; then
+        create_pre_push_hook_3
+    elif [ "$choice_pre_push" = "4" ]; then
+        create_pre_push_hook_4
+    else
+        echo "Invalid option. Please try again."
+    fi
+}
+
+create_pre_push_hook_1() {
     cat > .git/hooks/pre-push << 'EOF'
 #!/bin/bash
 
@@ -46,6 +66,40 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "All tests passed."
+make fclean
+exit 0
+EOF
+    chmod +x .git/hooks/pre-push
+    echo "Pre-push hook configured."
+}
+
+create_pre_push_hook_2() {
+    echo -n "Enter the percentage of tests that must pass: "
+    read percentage
+    cat > .git/hooks/pre-push << EOF
+#!/bin/bash
+
+echo "Running tests before push..."
+make tests_run > .git/hooks/tmp_output_prepush.txt
+if [ \$? -ne 0 ]; then
+    echo "Tests failed. Fix the issues before pushing."
+    exit 1
+fi
+line=\$(grep 'Synthesis: Tested:' .git/hooks/tmp_output_prepush.txt)
+tested=\$(echo "\$line" | awk -F'[:|]' '{print $3}')
+passing=\$(echo "\$line" | awk -F'[:|]' '{print $5}')
+
+if [ \$tested -ne 0 ]; then
+    percentage_passed=\$((100 * \$passing / \$tested))
+else
+    percentage_passed=0
+fi
+
+if [ \$percentage_passed -lt $percentage ]; then
+    echo "Only \$percentage_passed% of tests passed. Fix the issues before pushing."
+    exit 1
+fi
+echo "\$percentage_passed% of tests passed."
 make fclean
 exit 0
 EOF
@@ -65,7 +119,7 @@ create_commit_msg_hook() {
     IFS=$'\n' read -d '' -r -a lines < "$keywords_file"
     keywords=$(IFS='|'; echo "${lines[*]}")
 
-    cat > .git/hooks/commit-msg <<EOF
+    cat > .git/hooks/commit-msg << EOF
 #!/bin/bash
 
 if ! grep -qE '$keywords' "\$1"; then
@@ -222,13 +276,13 @@ main_menu() {
                 read hook_number
                 clear_specific_hook $hook_number
                 ;;
+            6) backup_hooks ;;
+            7) restore_hooks ;;
             h) show_help "$in_main_loop" ;;
             q)
                 echo "Exiting..."
                 exit 0
                 ;;
-            6) backup_hooks ;;
-            7) restore_hooks ;;
             *) echo "Invalid option. Please try again." ;;
         esac
 
